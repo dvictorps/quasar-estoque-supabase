@@ -136,6 +136,7 @@ export default defineComponent({
 
     onMounted(() => {
       handleListProducts()
+      console.log(user)
     })
 
     return {

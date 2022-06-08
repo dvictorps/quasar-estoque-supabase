@@ -1,6 +1,6 @@
 <template>
   <q-page padding>
-      <q-form class="row justify-center" @submit.prevent="handleLogin">
+      <q-form class="row justify-center" @submit.prevent="handleLogin" id="formContato">
           <p class="col-12 text-h5 text-center"> Login </p>
         <div class="col-md-6 col-sm-6 col-xs-10 q-gutter-y-md">
             <q-input
@@ -15,6 +15,12 @@
               v-model="form.password"
               :rules="[val => (val && val.length >= 6) || 'Preencha o campo ']"
             />
+
+            <div class="text-center">
+              <p id="teste"></p>
+              <input id="valida" type="text" />
+              <p id="mensagem"></p>
+            </div>
 
             <div class="full-width q-pt-md">
              <q-btn
@@ -67,6 +73,16 @@ export default defineComponent({
 
     const { notifyError, notifySuccess } = useNotify()
 
+    let contador = 3
+
+    const num1 = Math.floor(Math.random() * 10)
+    const num2 = Math.floor(Math.random() * 10)
+    const resposta = num1 + num2
+
+    window.onload = function () {
+      document.getElementById('teste').innerHTML = 'Qual a soma de ' + num1 + ' + ' + num2 + '?'
+    }
+
     const form = ref({
       email: '',
       password: ''
@@ -76,15 +92,36 @@ export default defineComponent({
       if (isLoggedIn) {
         router.push({ name: 'me' })
       }
+      document.getElementById('formContato').onsubmit = function (e) {
+        // eslint-disable-next-line eqeqeq
+        if (document.getElementById('valida').value != resposta) {
+          document.getElementById('mensagem').innerHTML = 'A soma está errada!'
+          e.preventDefault()
+        }
+      }
     })
 
     const handleLogin = async () => {
       try {
-        await login(form.value)
-        notifySuccess('Bem vindo !!')
-        router.push({ name: 'me' })
+        if (contador > 0) {
+          // eslint-disable-next-line eqeqeq
+          if (document.getElementById('valida').value != resposta) {
+            console.log('Foda-se')
+          } else {
+            await login(form.value)
+            notifySuccess('Bem vindo !!')
+            router.push({ name: 'me' })
+          }
+        } else {
+          notifyError('login bloqueado, recarregue a página')
+        }
       } catch (error) {
-        notifyError('Você deve colocar um email e senha válidos !!')
+        contador--
+        if (contador <= 0) {
+          notifyError('login bloqueado, recarregue a página')
+        } else {
+          notifyError(`${contador} tentativas`)
+        }
       }
     }
 

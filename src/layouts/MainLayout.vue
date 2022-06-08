@@ -75,6 +75,12 @@ const linksList = [
     caption: '',
     icon: 'mdi-archive',
     routeName: 'product'
+  },
+  {
+    title: 'Pedidos',
+    caption: '',
+    icon: 'mdi-truck',
+    routeName: 'pedidos'
   }
 ]
 

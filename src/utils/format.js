@@ -7,4 +7,13 @@ const formatCurrency = (currency) => {
   return formatted
 }
 
-export { formatCurrency }
+const formataData = (data) => {
+  let dataFormatada = ''
+  for (let i = data.length - 1; i >= 0; i--) {
+    dataFormatada += data[i]
+  }
+
+  return dataFormatada
+}
+
+export { formatCurrency, formataData }
