@@ -17,7 +17,7 @@
             <p class="space">{{product.name}}</p>
             <p class="space">{{ formatCurrency(product.price) }}</p>
             <div class="local">
-              <q-btn flat class="space espaco" color="red" icon="delete" @click="deleteItem(this.cart)" />
+              <q-btn flat class="space espaco" color="red" icon="delete" @click="this.limpaUnidade(this.cart)" />
             </div>
           </div>
         </div>
@@ -89,6 +89,9 @@ export default defineComponent({
     },
     limpaCart: {
       type: Function
+    },
+    limpaUnidade: {
+      type: Function
     }
   },
   methods: {
@@ -113,6 +116,7 @@ export default defineComponent({
     },
     deleteItem: function (cart) {
       this.cart.splice(cart, 1)
+      this.nomesProductCart = ''
     },
     somarValorFinal () {
       this.valorFinal = 0

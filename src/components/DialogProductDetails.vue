@@ -34,6 +34,17 @@
           </q-card>
         </q-dialog>
 
+        <q-dialog v-model="validaT" v-if='this.valida'>
+          <q-card>
+            <q-card-section class="row items-center">
+              <p class="text-h6">Faça login por favor</p>
+            </q-card-section>
+            <q-card-actions align="center">
+              <q-btn outline label="ok" color="green" v-close-popup/>
+            </q-card-actions>
+          </q-card>
+        </q-dialog>
+
         <q-card>
             <q-card-section>
               <div class="text-h6">Detalhes do Produto: </div>
@@ -57,7 +68,7 @@
             <q-card-actions class="centro">
               <q-btn color="primary" icon="mdi-currency-usd"  @click="comprar = true"/>
               <q-btn color="red" icon="close" v-close-popup class="fechar" />
-              <q-btn icon="mdi-cart-variant" color="primary" v-on:click="addItemToCart(product)"/>
+              <q-btn icon="mdi-cart-variant" color="primary" v-on:click="addItemToCart(product)" @click="validaT = true"/>
             </q-card-actions>
         </q-card>
     </q-dialog>
@@ -153,12 +164,16 @@ export default defineComponent({
       // eslint-disable-next-line
 	    cart: [],
       teste: [],
-      comprar: false
+      comprar: false,
+      adicionarCarrinho: true,
+      valida: false,
+      validaT: false
     }
   },
   methods: {
 
     addItemToCart (product) {
+      this.validaId()
       console.log(this.id)
       this.cart.push(product)
       // console.log(product)
@@ -167,6 +182,16 @@ export default defineComponent({
     limparCart () {
       this.cart = []
       console.log(this.cart)
+    },
+    limparUnidade: function (cart) {
+      this.cart.splice(cart, 1)
+      console.log(this.cart)
+    },
+    validaId () {
+      if (this.id == null) {
+        console.log('testessdetezs')
+        this.valida = true
+      }
     }
   }
 })

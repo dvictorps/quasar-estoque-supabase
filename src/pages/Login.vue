@@ -106,7 +106,8 @@ export default defineComponent({
         if (contador > 0) {
           // eslint-disable-next-line eqeqeq
           if (document.getElementById('valida').value != resposta) {
-            console.log('Foda-se')
+            contador--
+            notifyError(`Tentativa Login ${contador + 1}`)
           } else {
             await login(form.value)
             notifySuccess('Bem vindo !!')

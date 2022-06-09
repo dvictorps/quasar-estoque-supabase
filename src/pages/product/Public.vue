@@ -135,7 +135,7 @@
           </span>
           <q-space/>
           <div class="cart">
-            <q-btn round color="primary" icon="shopping_cart" @click="btnCart()"/>
+            <q-btn round color="primary" icon="shopping_cart" @click="btnCart()" v-if = 'idUser'/>
           </div>
           <q-input v-model="filter" debounce="500" outlined placeholder="Pesquisa" class="col-md-1">
             <template v-slot:append>
@@ -201,6 +201,7 @@
       :show="showDialogDetails"
       :product="productDetails"
       :limpaCart="limparCart"
+      :limpaUnidade="limparUnidade"
       />
   </q-page>
 </template>
@@ -248,6 +249,12 @@ export default defineComponent({
       // eslint-disable-next-line
       this.$refs["modal-dialog"].limparCart()
       this.productsCart = []
+      console.log(this.productsCart, 2)
+    },
+    limparUnidade (cart) {
+      // eslint-disable-next-line
+      this.$refs["modal-dialog"].limparUnidade(cart)
+      this.productsCart.splice(cart, 1)
       console.log(this.productsCart, 2)
     }
   },
