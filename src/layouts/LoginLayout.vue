@@ -3,8 +3,6 @@
     <q-header elevated>
       <q-toolbar>
         <q-toolbar-title>
-          <img class="logo" src="../assets/unnamed.jpg" alt="teste">
-          <p class="teste">Superhardware</p>
         </q-toolbar-title>
       </q-toolbar>
     </q-header>
