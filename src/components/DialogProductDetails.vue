@@ -111,6 +111,9 @@ export default defineComponent({
     },
     numero: {
       type: String
+    },
+    idAdm: {
+      type: Number
     }
   },
   setup (props, { emit }) {
@@ -139,7 +142,7 @@ export default defineComponent({
     const handleCompra = async () => {
       console.log(props.estado)
       try {
-        await inserirCompra('compras', props.product.price, props.id, date, props.nome, props.estado, props.cidade, props.bairro, props.rua, props.numero, props.product.name)
+        await inserirCompra('compras', props.product.price, props.id, date, props.nome, props.estado, props.cidade, props.bairro, props.rua, props.numero, props.product.name, props.idAdm)
         console.log(props.product.price)
         console.log(props.id)
         notifySuccess('Compra realizada')

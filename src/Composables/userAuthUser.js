@@ -12,6 +12,14 @@ export default function useAuthUser () {
     return user
   }
 
+  const startConfig = async (table, id) => {
+    const { data, error } = await supabase
+      .from(table)
+      .insert({ user_id: id })
+    if (error) throw error
+    return data
+  }
+
   const logout = async () => {
     const { error } = await supabase.auth.signOut()
     if (error) throw error
@@ -32,9 +40,10 @@ export default function useAuthUser () {
       { email, password },
       {
         data: meta,
-        redirectTo: `${window.location.origin}/me?fromEmail=registrationConfirmation`
+        redirectTo: `${window.location.origin}/login`
       }
     )
+    startConfig('config', user.id)
     if (error) throw error
     return user
   }
@@ -69,6 +78,7 @@ export default function useAuthUser () {
     register,
     update,
     sendPasswordRestEmail,
-    resetPassword
+    resetPassword,
+    startConfig
   }
 }

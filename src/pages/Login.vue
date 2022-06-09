@@ -14,6 +14,7 @@
               label="Senha"
               v-model="form.password"
               :rules="[val => (val && val.length >= 6) || 'Preencha o campo ']"
+              type="password"
             />
 
             <div class="text-center">

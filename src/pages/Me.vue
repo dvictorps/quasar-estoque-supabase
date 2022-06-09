@@ -47,10 +47,12 @@ import { defineComponent, ref, onMounted } from 'vue'
 import useNotify from 'src/Composables/UseNotify'
 import useApi from 'src/Composables/UseApi'
 import useBrand from 'src/composables/UseBrand'
+import userAuthUser from 'src/Composables/userAuthUser'
 
 export default defineComponent({
   name: 'PageMe',
   setup () {
+    const { user } = userAuthUser()
     const table = 'config'
     const { list, update } = useApi()
     const { notifyError, notifySuccess } = useNotify()
@@ -64,7 +66,7 @@ export default defineComponent({
     })
 
     onMounted(() => {
-      handleGetConfig()
+      handleGetConfig(user.value.id)
     })
 
     const handleSubmit = async () => {
@@ -78,9 +80,9 @@ export default defineComponent({
       }
     }
 
-    const handleGetConfig = async () => {
+    const handleGetConfig = async (id) => {
       try {
-        config = await list(table)
+        config = await list(table, id)
         form.value = config[0]
       } catch (error) {
         notifyError(error.message)

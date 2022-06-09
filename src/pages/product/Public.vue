@@ -28,6 +28,7 @@
                     label="Senha"
                     v-model="form.senha"
                     :rules="[val => (val && val.length >= 6) || 'Preencha o campo ']"
+                    type="password"
                   />
                   <q-btn
                     label="Login"
@@ -156,10 +157,14 @@
             @update:model-value="handleListProducts(route.params.id)"
           />
       </template>
-      <template v-slot:item="props">
+    <template v-slot:item="props">
         <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4">
-          <q-card class="cursor-pointer" v-ripple:primary @click="handleShowDetails(props.row)">
-            <q-img img :src="props.row.img_url" />
+          <q-card class="cursor-pointer q-pa-lg" v-ripple:primary @click="handleShowDetails(props.row)">
+            <q-img
+            img :src="props.row.img_url"
+            fit="fill"
+            style=" width: 500px; height: 300px; display: block; margin: 0 auto;"
+            />
             <q-card-section class="text-center">
               <div class="text-h6">{{ props.row.name }}</div>
               <div class="text-subtitle">{{ formatCurrency(props.row.price) }}</div>
@@ -187,6 +192,7 @@
       :numero="numero"
       :show="showDialogDetails"
       :product="productDetails"
+      :idAdm="idAdm"
       @hide-dialog="showDialogDetails = false"
     />
     <CartPage
@@ -307,9 +313,10 @@ export default defineComponent({
     const productDetails = ref({})
     const optionsCategory = ref([])
     const categoryId = ref('')
+    const idAdm = route.params.id
     const initialPagination = ref({
       page: 1,
-      rowPerPage: 5
+      rowPerPage: 6
     })
 
     const handleListProducts = async (userId) => {
@@ -405,7 +412,8 @@ export default defineComponent({
       cidade,
       bairro,
       rua,
-      numero
+      numero,
+      idAdm
     }
   }
 })

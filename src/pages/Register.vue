@@ -20,6 +20,7 @@
               label="Senha"
               v-model="form.password"
               :rules="[val => (val && val.length >= 6) || 'Preencha o campo e coloque pelo menos 6 caracteres']"
+              type="password"
             />
 
             <div class="full-width q-pt-md">

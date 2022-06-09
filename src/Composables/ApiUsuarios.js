@@ -12,11 +12,11 @@ export default function apiUsuario () {
     if (error) throw error
     return data
   }
-  const inserirCompra = async (table, valor, idUsuario, date, nome, estado, cidade, bairro, rua, numero, nomeProduto) => {
+  const inserirCompra = async (table, valor, idUsuario, date, nome, estado, cidade, bairro, rua, numero, nomeProduto, idAdm) => {
     const { data, error } = await supabase
       .from(table)
       .insert({
-        idUsuario: idUsuario, valor: valor, data: date, nome: nome, estado: estado, cidade: cidade, bairro: bairro, rua: rua, numero: numero, nomeProduto: nomeProduto
+        idUsuario: idUsuario, valor: valor, data: date, nome: nome, estado: estado, cidade: cidade, bairro: bairro, rua: rua, numero: numero, nomeProduto: nomeProduto, idAdm: idAdm
       })
     if (error) throw error
     return data
@@ -29,10 +29,11 @@ export default function apiUsuario () {
     if (error) throw error
     return data
   }
-  const listaPedidos = async (table) => {
+  const listaPedidos = async (table, idAdm) => {
     const { data, error } = await supabase
       .from(table)
       .select('*')
+      .eq('idAdm', idAdm)
     if (error) throw error
     return data
   }

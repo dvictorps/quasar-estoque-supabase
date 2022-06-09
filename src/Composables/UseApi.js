@@ -20,10 +20,11 @@ export default function useApi () {
   const { setBrand } = useBrand()
   const $q = useQuasar()
 
-  const list = async (table) => {
+  const list = async (table, id) => {
     const { data, error } = await supabase
       .from(table)
       .select('*')
+      .eq('user_id', id)
     if (error) throw error
     return data
   }
