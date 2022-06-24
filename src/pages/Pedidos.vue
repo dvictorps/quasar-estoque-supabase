@@ -34,7 +34,7 @@ const columns = [
 
 import { defineComponent, onMounted, ref } from 'vue'
 import useNotify from 'src/Composables/UseNotify'
-import apiUsuario from 'src/Composables/ApiUsuarios'
+import apiUsuario from 'src/bff/ApiUsuarios'
 import userAuthUser from 'src/Composables/userAuthUser'
 
 export default defineComponent({
@@ -43,14 +43,14 @@ export default defineComponent({
     const { user } = userAuthUser()
     const compras = ref([])
     const loading = ref(true)
-    const { listaPedidos } = apiUsuario()
+    const { listaPedidosBff } = apiUsuario()
     const { notifyError } = useNotify()
     const table = 'compras'
 
     const handleListCompras = async () => {
       try {
         loading.value = true
-        compras.value = await listaPedidos(table, user.value.id)
+        compras.value = await listaPedidosBff(table, user.value.id)
         loading.value = false
       } catch (error) {
         notifyError(error.message)

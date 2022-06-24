@@ -1,14 +1,14 @@
 <template>
   <q-page padding>
     <div class="row">
-      <div class="col-12 text-center text-h4 text-weight-medium">
+      <div class="col-12 text-center titulo">
         {{ brand.name }}
-        <div class="text-right">
+        <div class="text-right icones">
         <q-btn v-if="login" label="Sair" color="primary" icon="person" @click="confirmar = true" class="btn-sair" />
         <q-btn v-else label="Entrar" color="primary" @click="icon = true" icon="person" class="btn-logar"/>
         <q-btn v-show="!login" label="Registrar" color="primary" @click="registrar = true" icon="person" class="btn-registrar" />
+        <q-btn v-show="login" label="Historico de Compras" color="primary" @click="handleGoToCompras" class="historico"/>
         <q-space />
-        <q-btn v-show="login" label="Historico de Compras" color="primary" @click="handleGoToCompras" />
         <q-dialog v-model="icon">
           <q-card>
             <q-card-section class="row items-center q-pb-none">
@@ -38,6 +38,53 @@
                     flat
                     v-close-popup
                   />
+                  <q-btn
+                    label="Esqueci a Senha"
+                    class="full-width"
+                    color="primary"
+                    fill
+                    @click="resetarSenha = true"
+                    v-close-popup
+                  />
+                </q-form>
+            </q-card-section>
+          </q-card>
+        </q-dialog>
+
+        <q-dialog v-model="resetarSenha">
+          <q-card>
+            <q-card-section class="row items-center q-pb-none">
+              <div class="text-h6">Nova Senha</div>
+              <q-space />
+            <q-btn icon="close" flat round dense v-close-popup />
+            </q-card-section>
+            <q-card-section>
+                <q-form @submit.prevent="handleAtualizaSenha">
+                  <q-input
+                    label="Email"
+                    v-model="reset.email"
+                    :rules="[val => (val && val.length > 0) || 'Preencha o campo ']"
+                    type="email"
+                  />
+                  <q-input
+                    label="Palavra Chave"
+                    v-model="reset.palavraChave"
+                    :rules="[val => (val && val.length > 0) || 'Preencha o campo ']"
+                  />
+                  <q-input
+                    label="Nova Senha"
+                    v-model="reset.novaSenha"
+                    :rules="[val => (val && val.length >= 6) || 'Preencha o campo ']"
+                    type="password"
+                  />
+                  <q-btn
+                    label="Alterar"
+                    class="full-width"
+                    color="primary"
+                    type="submit"
+                    flat
+                    v-close-popup
+                  />
                 </q-form>
             </q-card-section>
           </q-card>
@@ -59,9 +106,10 @@
                     type="email"
                   />
                   <q-input
-                    label="Senha"
+                    label="Senha (min 6 caractéres)"
                     v-model="register.senha"
                     :rules="[val => (val && val.length >= 6) || 'Preencha o campo ']"
+                    type="password"
                   />
                   <q-input
                     label="Nome Completo"
@@ -91,6 +139,11 @@
                   <q-input
                     label="Número da casa"
                     v-model="register.numero"
+                    :rules="[val => (val && val.length > 0) || 'Preencha o campo ']"
+                  />
+                  <q-input
+                    label="Palavra Chave para recuperar senha (números ou letras)"
+                    v-model="register.palavraChave"
                     :rules="[val => (val && val.length > 0) || 'Preencha o campo ']"
                   />
                   <q-btn
@@ -128,21 +181,14 @@
       grid
       :filter="filter"
       v-model:pagination="initialPagination"
-      hide-pagination
       >
       <template v-slot:top>
-          <span class="text-h6">
-              Produtos
-          </span>
-          <q-space/>
-          <div class="cart">
-            <q-btn round color="primary" icon="shopping_cart" @click="btnCart()" v-if = 'idUser'/>
-          </div>
-          <q-input v-model="filter" debounce="500" outlined placeholder="Pesquisa" class="col-md-1">
+          <q-input v-model="filter" debounce="500" outlined placeholder="Pesquisa" class="pesquisa">
             <template v-slot:append>
               <q-icon name="mdi-magnify" />
             </template>
           </q-input>
+          <q-space/>
           <q-select
             outlined
             label = "categoria"
@@ -150,7 +196,7 @@
             v-model = "categoryId"
             option-label="name"
             option-value="id"
-            class="col-md-2 q-ml-sm"
+            class="categoria"
             map-options
             emit-value
             clearable
@@ -158,29 +204,25 @@
           />
       </template>
     <template v-slot:item="props">
-        <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4">
-          <q-card class="cursor-pointer q-pa-lg" v-ripple:primary @click="handleShowDetails(props.row)">
-            <q-img
-            img :src="props.row.img_url"
-            fit="fill"
-            style=" width: 500px; height: 300px; display: block; margin: 0 auto;"
-            />
-            <q-card-section class="text-center">
-              <div class="text-h6">{{ props.row.name }}</div>
-              <div class="text-subtitle">{{ formatCurrency(props.row.price) }}</div>
+      <div class="linha">
+        <div class="produto">
+            <div class="q-pa-md">
+
+          <q-card class="my-card" v-ripple:primary @click="handleShowDetails(props.row)">
+            <q-img :src="props.row.img_url" class="img">
+              <div class="absolute-bottom text-h6">
+                {{ props.row.name }}
+              </div>
+            </q-img>
+            <q-card-section>
+            <div class="text-subtitle2">{{ formatCurrency(props.row.price) }}</div>
             </q-card-section>
           </q-card>
+          </div>
         </div>
+      </div>
       </template>
     </q-table>
-    <div class="row justify-center">
-      <q-pagination
-          :max="pagesNumber"
-          direction-links
-          v-model="initialPagination"
-          @update:model-value="handleScrollToTop"
-       />
-    </div>
     <DialogProductDetails
       ref="modal-dialog"
       :id="idUser"
@@ -193,22 +235,8 @@
       :show="showDialogDetails"
       :product="productDetails"
       :idAdm="idAdm"
-      @hide-dialog="showDialogDetails = false"
+      @hide-dialog="showDialogDetails = false, handleListProducts(route.params.id)"
     />
-    <CartPage
-      ref="modal-cart"
-      :id="idUser"
-      :nome="nome"
-      :cidade="cidade"
-      :estado="estado"
-      :rua="rua"
-      :bairro="bairro"
-      :numero="numero"
-      :show="showDialogDetails"
-      :product="productDetails"
-      :limpaCart="limparCart"
-      :limpaUnidade="limparUnidade"
-      />
   </q-page>
 </template>
 
@@ -229,8 +257,7 @@ import useApi from 'src/Composables/UseApi'
 import useNotify from 'src/Composables/UseNotify'
 import { useRoute, useRouter } from 'vue-router'
 import DialogProductDetails from 'components/DialogProductDetails'
-import CartPage from 'components/Cart'
-import apiUsuario from 'src/Composables/ApiUsuarios'
+import apiUsuario from 'src/bff/ApiUsuarios'
 import { openURL } from 'quasar'
 
 export default defineComponent({
@@ -238,43 +265,14 @@ export default defineComponent({
 
   data: () => {
     return {
-      productsCart: [],
       icon: false,
       confirmar: false,
-      registrar: false
-    }
-  },
-  methods: {
-    btnCart () {
-      // eslint-disable-next-line
-      this.productsCart = this.$refs["modal-dialog"].cart
-      // eslint-disable-next-line
-      this.$refs["modal-cart"].abrirModal(this.productsCart)
-    },
-    limparCart () {
-      // eslint-disable-next-line
-      this.$refs["modal-dialog"].limparCart()
-      this.productsCart = []
-      console.log(this.productsCart, 2)
-    },
-    limparUnidade (cart) {
-      // eslint-disable-next-line
-      this.$refs["modal-dialog"].limparUnidade(cart)
-      this.productsCart.splice(cart, 1)
-      console.log(this.productsCart, 2)
-    }
-  },
-  watch: {
-    lista (val) {
-      this.renderComponent = false
-      this.$nextTick(() => {
-        this.renderComponent = true
-      })
+      registrar: false,
+      resetarSenha: false
     }
   },
   components: {
-    DialogProductDetails,
-    CartPage
+    DialogProductDetails
   },
 
   setup () {
@@ -290,7 +288,13 @@ export default defineComponent({
       numero: '',
       cidade: '',
       nome: '',
-      estado: ''
+      estado: '',
+      palavraChave: ''
+    })
+    const reset = ref({
+      email: '',
+      novaSenha: '',
+      palavraChave: ''
     })
     const nome = ref()
     const estado = ref()
@@ -299,7 +303,7 @@ export default defineComponent({
     const rua = ref()
     const numero = ref()
     const idUser = ref()
-    const { logar, registrar } = apiUsuario()
+    const { logarBff, registrarbff, atualizaSenhaBff } = apiUsuario()
     const products = ref([])
     const loading = ref(true)
     const login = ref(false)
@@ -316,7 +320,7 @@ export default defineComponent({
     const idAdm = route.params.id
     const initialPagination = ref({
       page: 1,
-      rowPerPage: 6
+      rowsPerPage: 6
     })
 
     const handleListProducts = async (userId) => {
@@ -342,10 +346,19 @@ export default defineComponent({
 
     const handleRegister = async () => {
       try {
-        await registrar('usuarios', register.value)
+        await registrarbff('usuarios', register.value)
         notifySuccess('Cadastro efetuado !!')
       } catch (error) {
         notifyError(error.message)
+      }
+    }
+
+    const handleAtualizaSenha = async () => {
+      try {
+        await atualizaSenhaBff('usuarios', reset.value.palavraChave, reset.value.email, reset.value.novaSenha)
+        notifySuccess('Senha Alterada !!')
+      } catch (error) {
+        notifyError('Falha ao atualizar')
       }
     }
 
@@ -355,7 +368,7 @@ export default defineComponent({
 
     const handleLogin = async () => {
       try {
-        const resposta = await logar('usuarios', form.value.email, form.value.senha)
+        const resposta = await logarBff('usuarios', form.value.email, form.value.senha)
         notifySuccess('usuário encontrado !!')
         login.value = true
         idUser.value = resposta[0].id
@@ -413,12 +426,14 @@ export default defineComponent({
       bairro,
       rua,
       numero,
-      idAdm
+      idAdm,
+      reset,
+      handleAtualizaSenha
     }
   }
 })
 </script>
-<style>
+<style scoped>
 .cart{
   padding-right: 10px;
 }
@@ -430,14 +445,68 @@ margin: 0 auto;
 
 .btn-registrar {
   margin-left: 2%;
-  margin-bottom: 1%;
 }
 
-.btn-logar {
-  margin-bottom: 1%;
+.historico{
+  margin-left: 2%;
 }
 
-.btn-sair {
-  margin-bottom: 1%;
+.titulo{
+  font-size: 45px;
+  font-weight: bold;
+  font-style: italic;
+  margin-bottom: 3%;
+}
+
+.my-card{
+  border: 1px solid black;
+  padding: 10px;
+}
+
+.linha{
+  width: 33.3%;
+  padding: 5px;
+}
+
+.categoria{
+  min-width: 300px;
+}
+
+.pesquisa{
+  min-width: 300px;
+}
+
+.img{
+  min-height: 400px; max-width: 450px; display: block; margin: 0 auto;max-width: 400px;
+}
+
+.produto{
+  width: 100%;
+}
+
+@media screen and (max-width: 1100px) {
+  .linha{
+  width: 50%;
+  padding: 5px;
+}
+}
+
+@media screen and (max-width: 1100px) {
+  .pesquisa{
+  width: 100%;
+  margin-bottom: 2%;
+  margin-top: 2%;
+}
+  .categoria{
+    width: 100%;
+    margin-bottom: 2%;
+  }
+}
+
+@media screen and (max-width: 850px) {
+  .linha{
+  width: 100%;
+  padding: 5px;
+  }
 }
 </style>

@@ -39,6 +39,7 @@
             <q-editor
               v-model="form.description"
               min-height="5rem"
+              class="editor"
             />
 
             <q-select
@@ -150,3 +151,9 @@ export default defineComponent({
   }
 })
 </script>
+
+<style scoped>
+.editor{
+  font-family:'Times New Roman', Times, serif
+}
+</style>

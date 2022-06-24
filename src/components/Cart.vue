@@ -40,7 +40,7 @@
 <script>
 import { ref, defineComponent } from 'vue'
 import { formatCurrency } from 'src/utils/format'
-import apiUsuario from 'src/Composables/ApiUsuarios'
+import apiUsuario from 'src/bff/ApiUsuarios'
 const columns = [
   { format: (val) => formatCurrency(val), sortable: true }
 ]
@@ -146,8 +146,7 @@ export default defineComponent({
     },
 
     async handleCompra () {
-      const { inserirCompra } = apiUsuario()
-
+      const { inserirCompraBff } = apiUsuario()
       const data = new Date()
       const dia = String(data.getDate()).padStart(2, '0')
       const mes = String(data.getMonth() + 1).padStart(2, '0')
@@ -159,7 +158,7 @@ export default defineComponent({
       const date = `Compra realizada em ${dia}/${mes}/${ano}, aproximadamente as ${hora}:${min}:${sec}`
       console.log(this.estado)
       try {
-        await inserirCompra('compras', this.valorFinal, this.id, date, this.nome, this.estado, this.cidade, this.bairro, this.rua, this.numero, this.nomeProductCart())
+        await inserirCompraBff('compras', this.valorFinal, this.id, date, this.nome, this.estado, this.cidade, this.bairro, this.rua, this.numero, this.nomeProductCart())
         alert('Compra realizada')
       } catch (error) {
         console.log(error)

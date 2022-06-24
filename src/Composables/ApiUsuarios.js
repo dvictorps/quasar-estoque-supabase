@@ -3,11 +3,11 @@ import useSupabase from 'src/boot/supabase'
 export default function apiUsuario () {
   const { supabase } = useSupabase()
 
-  const registrar = async (table, form) => {
+  const registrar = async (table, register) => {
     const { data, error } = await supabase
       .from(table)
       .insert({
-        ...form
+        ...register
       })
     if (error) throw error
     return data
@@ -37,6 +37,22 @@ export default function apiUsuario () {
     if (error) throw error
     return data
   }
+  const atualizaSenha = async (table, palavraChave, email, novaSenha) => {
+    const { data, error } = await supabase
+      .from(table)
+      .update({ senha: novaSenha })
+      .match({ palavraChave: palavraChave, email: email })
+    if (error) throw error
+    return data
+  }
+  const atualizaProduto = async (table, id, quantidade) => {
+    const { data, error } = await supabase
+      .from(table)
+      .update({ amount: quantidade - 1 })
+      .match({ id: id })
+    if (error) throw error
+    return data
+  }
   const logar = async (table, email, senha) => {
     const { data, error } = await supabase
       .from(table)
@@ -56,6 +72,8 @@ export default function apiUsuario () {
     logar,
     listaCompras,
     inserirCompra,
-    listaPedidos
+    listaPedidos,
+    atualizaProduto,
+    atualizaSenha
   }
 }

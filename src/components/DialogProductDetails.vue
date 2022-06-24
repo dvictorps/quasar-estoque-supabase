@@ -12,6 +12,9 @@
               <div class="text-h6">
                 {{product.name}}
               </div>
+              <br>
+              <hr>
+              <br>
               <div class="text-subtitle">
                 {{ formatCurrency(product.price) }}
               </div>
@@ -51,24 +54,22 @@
             </q-card-section>
 
             <q-card-section>
-              <q-img :src="product.img_url" style="min-width:300px" />
+              <q-img :src="product.img_url" />
             </q-card-section>
 
             <q-card-section>
-              <div class="text-h6">
+              <div class="titulo">
                 {{product.name}}
-                {{id}}
               </div>
-              <div class="text-subtitle">
-                {{ formatCurrency(product.price) }}
+              <div class="preco-quant">
+                Valor: {{ formatCurrency(product.price) }} / Quantidade Disponível: {{product.amount}}
               </div>
-              <div class="text-body2" v-html="product.description" />
+              <div class="desc" v-html="product.description" />
             </q-card-section>
 
             <q-card-actions class="centro">
-              <q-btn color="primary" icon="mdi-currency-usd"  @click="comprar = true"/>
+              <q-btn color="primary" icon="mdi-currency-usd"  @click="comprar = true" class="comprar"/>
               <q-btn color="red" icon="close" v-close-popup class="fechar" />
-              <q-btn icon="mdi-cart-variant" color="primary" v-on:click="addItemToCart(product)" @click="validaT = true"/>
             </q-card-actions>
         </q-card>
     </q-dialog>
@@ -80,7 +81,7 @@ import { formatCurrency } from 'src/utils/format'
 import useNotify from 'src/Composables/UseNotify'
 import { openURL } from 'quasar'
 import UseApi from 'src/Composables/UseApi'
-import apiUsuario from 'src/Composables/ApiUsuarios'
+import apiUsuario from 'src/bff/ApiUsuarios'
 export default defineComponent({
   name: 'DialogProductDetails',
   props: {
@@ -123,7 +124,7 @@ export default defineComponent({
 
     const msg = 'Olá, me interessei no produto: '
 
-    const { inserirCompra } = apiUsuario()
+    const { inserirCompraBff, atualizaProdutoBff } = apiUsuario()
 
     const handleClose = () => {
       emit('hideDialog')
@@ -142,10 +143,13 @@ export default defineComponent({
     const handleCompra = async () => {
       console.log(props.estado)
       try {
-        await inserirCompra('compras', props.product.price, props.id, date, props.nome, props.estado, props.cidade, props.bairro, props.rua, props.numero, props.product.name, props.idAdm)
-        console.log(props.product.price)
-        console.log(props.id)
-        notifySuccess('Compra realizada')
+        if (props.product.amount !== 0) {
+          await inserirCompraBff('compras', props.product.price, props.id, date, props.nome, props.estado, props.cidade, props.bairro, props.rua, props.numero, props.product.name, props.idAdm)
+          await atualizaProdutoBff('product', props.product.id, props.product.amount)
+          notifySuccess('Compra realizada')
+        } else {
+          notifyError('Quantidade indisponível')
+        }
       } catch (error) {
         notifyError(error.message)
       }
@@ -164,57 +168,20 @@ export default defineComponent({
   },
   data: function () {
     return {
-      // eslint-disable-next-line
-	    cart: [],
-      teste: [],
       comprar: false,
       adicionarCarrinho: true,
       valida: false,
       validaT: false
-    }
-  },
-  methods: {
-
-    addItemToCart (product) {
-      this.validaId()
-      console.log(this.id)
-      this.cart.push(product)
-      // console.log(product)
-      /*  this.teste = this.cart */
-    },
-    limparCart () {
-      this.cart = []
-      console.log(this.cart)
-    },
-    limparUnidade: function (cart) {
-      this.cart.splice(cart, 1)
-      console.log(this.cart)
-    },
-    validaId () {
-      if (this.id == null) {
-        console.log('testessdetezs')
-        this.valida = true
-      }
     }
   }
 })
 </script>
 
 <style scoped>
-.button-zap{
-width: 30.0%;
-height: 38px;
-border-radius: 5px;
-border: 2px solid black;
-margin-left: 3%;
-text-align: center;
-padding: 2px;
-background-color: lawngreen;
-}
-.button-zap img{
-  width: 30px;
-  height: 30px;
-  position: relative;
+.desc{
+  border: 1px solid black;
+  padding: 10px;
+  border-radius: 5%;
 }
 .fechar{
 width: 30.0%;
@@ -225,6 +192,36 @@ margin-left: 1%;
 text-align: center;
 padding: 2px;
 background-color: purple;
+}
+
+.titulo {
+  width: 100%;
+  font-size: 36px;
+  padding: 20px;
+  text-align: center;
+}
+
+.comprar{
+width: 30.0%;
+height: 38px;
+border-radius: 5px;
+border: 2px solid black;
+margin-left: 1%;
+text-align: center;
+padding: 2px;
+background-color: purple;
+}
+
+.preco-quant{
+  margin: 0 auto;
+  text-align: center;
+  font-size: 20px;
+  padding: 10px;
+  background-color: rgba(10, 252, 34, 0.5);
+  margin-bottom: 5px;
+  font-weight: bold;
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
 }
 
 .centro{

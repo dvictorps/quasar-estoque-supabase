@@ -28,7 +28,7 @@ const columns = [
 
 import { defineComponent, onMounted, ref } from 'vue'
 import useNotify from 'src/Composables/UseNotify'
-import apiUsuario from 'src/Composables/ApiUsuarios'
+import apiUsuario from 'src/bff/ApiUsuarios'
 import { useRoute } from 'vue-router'
 
 export default defineComponent({
@@ -36,7 +36,7 @@ export default defineComponent({
   setup () {
     const compras = ref([])
     const loading = ref(true)
-    const { listaCompras } = apiUsuario()
+    const { listaComprasBff } = apiUsuario()
     const { notifyError } = useNotify()
     const table = 'compras'
     const route = useRoute()
@@ -44,7 +44,7 @@ export default defineComponent({
     const handleListCompras = async (usuarioId) => {
       try {
         loading.value = true
-        compras.value = await listaCompras(table, usuarioId)
+        compras.value = await listaComprasBff(table, usuarioId)
         loading.value = false
       } catch (error) {
         notifyError(error.message)
